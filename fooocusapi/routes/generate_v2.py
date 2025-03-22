@@ -1,8 +1,15 @@
 """Generate API V2 routes
 
 """
+import base64
+import shutil
+from PIL import Image
+import os
+from io import BytesIO
+import uuid
 from typing import List
 from fastapi import APIRouter, Depends, Header, Query
+from fastapi.responses import JSONResponse
 
 from fooocusapi.models.common.base import EnhanceCtrlNets, GenerateMaskRequest
 from fooocusapi.utils.api_utils import api_key_auth
@@ -11,7 +18,7 @@ from fooocusapi.models.requests_v2 import (
     ImageEnhanceRequestJson, ImgInpaintOrOutpaintRequestJson,
     ImgPromptRequestJson,
     Text2ImgRequestWithPrompt,
-    ImgUpscaleOrVaryRequestJson
+    ImgUpscaleOrVaryRequestJson, ObjectReplaceRequestJson
 )
 from fooocusapi.models.common.response import (
     AsyncJobResponse,
@@ -155,6 +162,148 @@ def img_inpaint_or_outpaint(
 
     return call_worker(req, accept)
 
+
+@secure_router.post(
+        path="/ai/api/v1/object_replace",
+        response_model=List[GeneratedImageResult] | AsyncJobResponse,
+        responses=img_generate_responses,
+        tags=["GenerateV2"])
+def img_inpaint_or_outpaint(
+    req_obj: ObjectReplaceRequestJson,
+    #req: ImgInpaintOrOutpaintRequestJson,
+    accept: str = Header(None),
+    accept_query: str | None = Query(
+        None, alias='accept',
+        description="Parameter to override 'Accept' header, 'image/png' for output bytes")):
+    """\nInpaint or outpaint\n
+    Inpaint or outpaint
+    Arguments:
+        req {ImgInpaintOrOutpaintRequestJson} -- Request body
+        accept {str} -- Accept header
+        accept_query {str} -- Parameter to override 'Accept' header, 'image/png' for output bytes
+    Returns:
+        Response -- img_generate_responses
+    """
+    if accept_query is not None and len(accept_query) > 0:
+        accept = accept_query
+
+    req = ImgInpaintOrOutpaintRequestJson(
+        input_image = req_obj.image,
+        input_mask = req_obj.mask,
+        prompt = req_obj.prompt,
+        inpaint_additional_prompt = '',
+        outpaint_selections = [],
+        outpaint_distance_left = -1,
+        outpaint_distance_right = -1,
+        outpaint_distance_top = -1,
+        outpaint_distance_bottom = -1,
+        image_prompts = [],
+    )
+
+    req.input_image = base64_to_stream(req.input_image)
+    if req.input_mask is not None:
+        req.input_mask = base64_to_stream(req.input_mask)
+    default_image_prompt = ImagePrompt(cn_img=None)
+    image_prompts_files: List[ImagePrompt] = []
+    for image_prompt in req.image_prompts:
+        image_prompt.cn_img = base64_to_stream(image_prompt.cn_img)
+        image = ImagePrompt(
+            cn_img=image_prompt.cn_img,
+            cn_stop=image_prompt.cn_stop,
+            cn_weight=image_prompt.cn_weight,
+            cn_type=image_prompt.cn_type)
+        image_prompts_files.append(image)
+    while len(image_prompts_files) <= 4:
+        image_prompts_files.append(default_image_prompt)
+    req.image_prompts = image_prompts_files
+
+    primary_response = call_worker(req, accept)
+
+    if primary_response:
+        first_element = primary_response[0]
+    else:
+        first_element = None  # or handle accordingly
+    output_image_url = remove_baseUrl(first_element.url)
+    local_output_image_path = "/Fooocus-API/outputs" + remove_baseUrl(first_element.url)
+
+    new_out_images_directory_name = '/object_replace_images/'
+    new_local_out_image_directory = get_save_img_directory(new_out_images_directory_name)
+    new_local_out_image_path =  new_local_out_image_directory + output_image_url
+    move_file(local_output_image_path,new_local_out_image_directory)
+
+    response_data = {
+        "success": True,
+        "message": "Returned output successfully",
+        "server_process_time": 0.0,
+        "output_image_url": '/media' + new_out_images_directory_name + new_local_out_image_path.split('/')[-1]
+    }
+
+    return JSONResponse(content=response_data, status_code=200)
+
+
+def move_file(src_path: str, dest_path: str):
+    try:
+        if not os.path.isfile(src_path):
+            return f"Error: Source file '{src_path}' does not exist."
+        dest_dir = os.path.dirname(dest_path)
+        if dest_dir and not os.path.exists(dest_dir):
+            os.makedirs(dest_dir)
+        new_path = shutil.move(src_path, dest_path)
+        return f"File moved successfully to '{new_path}'"
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+def remove_baseUrl(url: str) -> str:
+    return "/files" + url.split("/files", 1)[-1] if "/files" in url else url
+
+def get_save_img_directory(directory_name):
+    current_dir = '/tmp'
+    img_directory = current_dir + '/.temp' + directory_name
+    os.makedirs(img_directory, exist_ok=True)
+    return img_directory
+
+
+@secure_router.post(
+        path="/v2/generation/image-inpaint-outpaint",
+        response_model=List[GeneratedImageResult] | AsyncJobResponse,
+        responses=img_generate_responses,
+        tags=["GenerateV2"])
+def img_Expand(
+    req: ImgInpaintOrOutpaintRequestJson,
+    accept: str = Header(None),
+    accept_query: str | None = Query(
+        None, alias='accept',
+        description="Parameter to override 'Accept' header, 'image/png' for output bytes")):
+    """\nInpaint or outpaint\n
+    Inpaint or outpaint
+    Arguments:
+        req {ImgInpaintOrOutpaintRequestJson} -- Request body
+        accept {str} -- Accept header
+        accept_query {str} -- Parameter to override 'Accept' header, 'image/png' for output bytes
+    Returns:
+        Response -- img_generate_responses
+    """
+    if accept_query is not None and len(accept_query) > 0:
+        accept = accept_query
+
+    req.input_image = base64_to_stream(req.input_image)
+    if req.input_mask is not None:
+        req.input_mask = base64_to_stream(req.input_mask)
+    default_image_prompt = ImagePrompt(cn_img=None)
+    image_prompts_files: List[ImagePrompt] = []
+    for image_prompt in req.image_prompts:
+        image_prompt.cn_img = base64_to_stream(image_prompt.cn_img)
+        image = ImagePrompt(
+            cn_img=image_prompt.cn_img,
+            cn_stop=image_prompt.cn_stop,
+            cn_weight=image_prompt.cn_weight,
+            cn_type=image_prompt.cn_type)
+        image_prompts_files.append(image)
+    while len(image_prompts_files) <= 4:
+        image_prompts_files.append(default_image_prompt)
+    req.image_prompts = image_prompts_files
+
+    return call_worker(req, accept)
 
 @secure_router.post(
         path="/v2/generation/image-prompt",

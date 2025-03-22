@@ -109,7 +109,7 @@ class CommonRequest(BaseModel):
     advanced_params: AdvancedParams = AdvancedParams()
     save_meta: bool = Field(default=True, description="Save meta data")
     meta_scheme: str = Field(default='fooocus', description="Meta data scheme, one of [fooocus, a111]")
-    save_extension: str = Field(default='png', description="Save extension, one of [png, jpg, webp]")
+    save_extension: str = Field(default='jpg', description="Save extension, one of [png, jpg, webp]")
     save_name: str = Field(default='', description="Image name for output image, default is job id + seq")
     read_wildcards_in_order: bool = Field(default=False, description="Read wildcards in order")
     require_base64: bool = Field(default=False, description="Return base64 data of generated image")

@@ -17,7 +17,7 @@ from fooocusapi.models.requests_v1 import (
     ImgInpaintOrOutpaintRequest
 )
 from fooocusapi.models.common.response import (
-    AsyncJobResponse,
+    AsyncJobResponse, 
     GeneratedImageResult,
     DescribeImageResponse,
     StopResponse

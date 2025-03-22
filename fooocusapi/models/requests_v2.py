@@ -18,6 +18,7 @@ class ImagePromptJson(BaseModel):
     cn_type: ControlNetType = Field(default=ControlNetType.cn_ip, description="ControlNet type for image prompt")
 
 
+
 class ImgInpaintOrOutpaintRequestJson(CommonRequest):
     """image inpaint or outpaint request"""
     input_image: str = Field('', description="Init image for inpaint or outpaint as base64")
@@ -29,6 +30,13 @@ class ImgInpaintOrOutpaintRequestJson(CommonRequest):
     outpaint_distance_top: int | None = Field(-1, description="Set outpaint top distance")
     outpaint_distance_bottom: int | None = Field(-1, description="Set outpaint bottom distance")
     image_prompts: List[ImagePromptJson | ImagePrompt] = []
+
+class ObjectReplaceRequestJson:
+    image: str = Field('', description="Init image for inpaint or outpaint as base64")
+    mask: str | None = Field('', description="Inpaint or outpaint mask as base64")
+    prompt: str | None = Field('', description="Inpaint or outpaint mask as base64")
+    sdGuidanceScale: float = Field(default=4, ge=1.0, le=30.0)
+    sdSteps: int = Field(default=40)
 
 
 class ImgPromptRequestJson(ImgInpaintOrOutpaintRequestJson):

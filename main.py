@@ -171,6 +171,7 @@ def pre_setup():
     install_dependents(arguments.skip_pip)
 
     prepare_environments(arguments)
+    
 
     # Start task schedule thread
     from fooocusapi.worker import task_schedule_loop

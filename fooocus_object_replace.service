@@ -1,13 +1,13 @@
 [Unit]
-Description=lama_object_replace.service - A FastApi application for object replace using Fooocus-api  project by mrhan1993 
+Description=Fooocus_object_replace.service - A FastApi application for object replace using Fooocus-api  project by mrhan1993 
 After=network.target
 
 [Service]
-Environment="PATH=/Fooocus-API/.venv/bin"
-WorkingDirectory=/Fooocus-API/
+Environment="PATH=/home/Foocus_ObjectReplace/.venv/bin"
+WorkingDirectory=/home/Foocus_ObjectReplace/
 
 
-ExecStart=Fooocus-API/.venv/bin/python /Fooocus-API/main.py 
+ExecStart=/home/Foocus_ObjectReplace/.venv/bin/python /home/Foocus_ObjectReplace/main.py 
 StandardOutput=append:/var/log/object_replace/access.log
 StandardError=append:/var/log/object_replace/error.log
 

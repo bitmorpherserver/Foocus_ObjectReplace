@@ -31,7 +31,7 @@ class ImgInpaintOrOutpaintRequestJson(CommonRequest):
     outpaint_distance_bottom: int | None = Field(-1, description="Set outpaint bottom distance")
     image_prompts: List[ImagePromptJson | ImagePrompt] = []
 
-class ObjectReplaceRequestJson:
+class ObjectReplaceRequestJson(BaseModel):
     image: str = Field('', description="Init image for inpaint or outpaint as base64")
     mask: str | None = Field('', description="Inpaint or outpaint mask as base64")
     prompt: str | None = Field('', description="Inpaint or outpaint mask as base64")

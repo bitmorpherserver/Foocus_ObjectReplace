@@ -1,5 +1,6 @@
 #!/bin/bash
- 
+
+# Everything needs to be install manually. So, save your precious time!
 apt update -y
 apt upgrade -y
 
@@ -9,7 +10,7 @@ cd /home/evobits/
 git clone https://github.com/bitmorpherserver/Foocus_ObjectReplace.git
 cd Foocus_ObjectReplace/
 
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 
 

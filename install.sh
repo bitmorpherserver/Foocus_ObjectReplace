@@ -1,7 +1,7 @@
 #!/bin/bash
  
-apt update
-apt upgrade
+apt update -y
+apt upgrade -y
 
 cd
 cd /home/

@@ -3,11 +3,11 @@ Description=Fooocus_object_replace.service - A FastApi application for object re
 After=network.target
 
 [Service]
-Environment="PATH=/home/Foocus_ObjectReplace/.venv/bin"
-WorkingDirectory=/home/Foocus_ObjectReplace/
+Environment="PATH=/home/evobits/Foocus_ObjectReplace/.venv/bin"
+WorkingDirectory=/home/evobits/Foocus_ObjectReplace/
 
 
-ExecStart=/home/Foocus_ObjectReplace/.venv/bin/python /home/Foocus_ObjectReplace/main.py 
+ExecStart=/home/evobits/Foocus_ObjectReplace/.venv/bin/python /home/evobits/Foocus_ObjectReplace/main.py 
 StandardOutput=append:/var/log/object_replace/access.log
 StandardError=append:/var/log/object_replace/error.log
 

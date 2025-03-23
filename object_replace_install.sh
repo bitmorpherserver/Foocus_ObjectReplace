@@ -4,7 +4,7 @@ apt update -y
 apt upgrade -y
 
 cd
-cd /home/
+cd /home/evobits/
 
 git clone https://github.com/bitmorpherserver/Foocus_ObjectReplace.git
 cd Foocus_ObjectReplace/
@@ -13,7 +13,7 @@ python -m venv .venv
 source .venv/bin/activate
 
 
-cd /home/Foocus_ObjectReplace
+cd /home/evobits/Foocus_ObjectReplace
 pip install -r requirements.txt 
 
 cp fooocus_object_replace.service /etc/systemd/system/

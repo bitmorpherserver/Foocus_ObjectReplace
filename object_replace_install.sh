@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Everything needs to be install manually. So, save your precious time!
+# make a directory
 apt update -y
 apt upgrade -y
 
@@ -10,7 +11,7 @@ cd /home/evobits/
 git clone https://github.com/bitmorpherserver/Foocus_ObjectReplace.git
 cd Foocus_ObjectReplace/
 
-python3 -m venv .venv
+python -m venv .venv
 source .venv/bin/activate
 
 
@@ -30,3 +31,6 @@ ln -s /etc/nginx/sites-available/fooocus_object_replace_nginx.conf /etc/nginx/si
 service nginx restart
 
 # python main.py 
+# make a directory at /var/log/ named foocus_object_replace 
+# clear port before loading project 
+# do not have same file name. 
